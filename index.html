@@ -11,25 +11,32 @@
     <nav class="navbar">
         <div class="logo">🛒 Tienda Final 2025</div>
         <ul class="nav-links">
-            <li><a href="#" class="active">Clientes</a></li>
-            <li><a href="#">Productos</a></li>
-            <li><a href="#">Órdenes</a></li>
-        </ul>
+            <li><a href="#" id="nav-clients" class="active">Clientes</a></li>
+            <li><a href="#" id="nav-products">Productos</a></li>
+            </ul>
     </nav>
 
     <main class="container">
-        <header class="header-section">
-            <h1>Gestión de Clientes</h1>
-            <p>Lista de usuarios registrados en el sistema.</p>
-            <button id="btnLoadClients" class="btn-primary">🔄 Recargar Lista</button>
-        </header>
+        
+        <section id="section-clients">
+            <header class="header-section">
+                <h1>Gestión de Clientes</h1>
+                <button id="btnLoadClients" class="btn-primary">🔄 Recargar Lista</button>
+            </header>
+            <div id="clientsList" class="cards-grid"></div>
+        </section>
 
-        <div id="clientsList" class="cards-grid">
-            <p>Cargando clientes...</p>
-        </div>
+        <section id="section-products" style="display: none;">
+            <header class="header-section">
+                <h1>Catálogo de Productos</h1>
+                <button id="btnLoadProducts" class="btn-primary">🔄 Recargar Productos</button>
+            </header>
+            <div id="productsList" class="cards-grid"></div>
+        </section>
+
     </main>
 
     <script src="js/api.js"></script>
     <script src="js/clients.js"></script>
-</body>
+    <script src="js/products.js"></script> <script src="js/navigation.js"></script> </body>
 </html>

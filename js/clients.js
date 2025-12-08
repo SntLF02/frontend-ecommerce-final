@@ -16,13 +16,13 @@ async function fetchClients() {
 
         // Convertimos la respuesta a JSON
         const clients = await response.json();
-        console.log("✅ Clientes recibidos:", clients);
+        console.log("Clientes recibidos:", clients);
 
         // Dibujamos los clientes
         renderClients(clients);
 
     } catch (error) {
-        console.error("❌ Error:", error);
+        console.error("Error:", error);
         clientsContainer.innerHTML = `<p style="color: red">Error al cargar clientes: ${error.message}</p>`;
     }
 }
@@ -43,8 +43,8 @@ function renderClients(clients) {
         
         card.innerHTML = `
             <h3>${client.name} ${client.lastname}</h3>
-            <p>📧 <span class="card-email">${client.email}</span></p>
-            <p>📞 ${client.telephone || 'Sin teléfono'}</p>
+            <p><span class="card-email">${client.email}</span></p>
+            <p>${client.telephone || 'Sin teléfono'}</p>
         `;
         
         clientsContainer.appendChild(card);
