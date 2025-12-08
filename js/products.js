@@ -96,8 +96,9 @@ function renderProducts(productsToRender) {
             </div>
             <div>
                 <p class="price-tag">$${product.price.toLocaleString()}</p>
-                <button class="btn-primary" onclick="buyProduct(${product.id_key}, ${product.price}, '${product.name}')">
-                    Agregar al Pedido ☕
+                <button class="btn-primary" 
+                    onclick='addToCart(${JSON.stringify(product)})'>
+                    Agregar al Carrito 🛒
                 </button>
             </div>
         `;
