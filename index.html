@@ -6,6 +6,7 @@
     <title>Barista Coffee Shop | Enterprise Edition</title>
     <link rel="stylesheet" href="css/styles.css">
     <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@700&family=Raleway:wght@300;400;600&display=swap" rel="stylesheet">
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
 </head>
 <body>
 
@@ -14,7 +15,8 @@
         <ul class="nav-links">
             <li><a href="#" id="nav-home" class="active">Inicio</a></li>
             <li><a href="#" id="nav-products">Catálogo</a></li>
-            <li><a href="#" id="nav-dashboard">System Status</a></li> </ul>
+            <li><a href="#" id="nav-dashboard">System Status</a></li>
+        </ul>
     </nav>
 
     <main class="container">
@@ -23,27 +25,28 @@
             <div class="hero-content">
                 <h1 class="hero-title">Arte en la Extracción.<br>Escalabilidad en el Código.</h1>
                 <p class="hero-slogan">Una experiencia de café de especialidad impulsada por una arquitectura de microservicios de alto rendimiento.</p>
-                
                 <div class="hero-buttons">
                     <button id="btnGoCatalog" class="btn-hero primary">Ver Catálogo ➔</button>
-                    <button id="btnGoDashboard" class="btn-hero secondary">Monitor de Latencia</button>
+                    <button id="btnGoDashboard" class="btn-hero secondary">Monitor de Latencia ⓘ</button>
                 </div>
             </div>
         </section>
 
-        <section id="section-clients" style="display: none;">
-            </section>
-
         <section id="section-products" style="display: none;">
-            <header class="header-section">
+            <header class="header-section" style="margin-bottom: 20px; text-align: center;">
                 <h1>Catálogo Premium</h1>
-                <button id="btnLoadProducts" class="btn-primary">🔄 Sincronizar Stock</button>
+                <p>Nuestra selección exclusiva de granos y equipamiento.</p>
             </header>
+            
+            <div id="categoryFilters" class="category-filters">
+                <button class="filter-btn active">Cargando categorías...</button>
+            </div>
+
             <div id="productsList" class="cards-grid"></div>
         </section>
 
         <section id="section-dashboard" style="display: none;">
-            <header class="header-section">
+            <header class="header-section" style="margin-bottom: 30px;">
                 <h1>Observabilidad del Sistema</h1>
                 <p>Monitoreo en tiempo real de la infraestructura (Docker + Redis + Postgres).</p>
             </header>
@@ -53,9 +56,9 @@
                     <h3>API Gateway</h3>
                     <div class="status-indicator">
                         <span id="api-status-dot" class="dot gray"></span>
-                        <span id="api-status-text">Conectando...</span>
+                        <span id="api-status-text">Verificando...</span>
                     </div>
-                    <p class="latency-text">Latencia: <span id="api-latency">--</span> ms</p>
+                    <p class="latency-text">Latencia Actual: <span id="api-latency" style="font-weight: bold; color: #2c1e16;">--</span> ms</p>
                 </div>
 
                 <div class="dash-card">
@@ -64,15 +67,21 @@
                         <span class="dot green"></span>
                         <span>Operativo</span>
                     </div>
-                    <p class="latency-text">Conexiones: Activas</p>
+                    <p class="latency-text">Conexiones Activas: <strong>4/100</strong></p>
                 </div>
 
                 <div class="dash-card">
                     <h3>Redis Cache Layer</h3>
                     <div class="status-indicator">
-                        <span class="dot green"></span> <span>Operativo</span>
+                        <span class="dot green"></span>
+                        <span>Operativo</span>
                     </div>
-                    <p class="latency-text">Hit Rate: 98.5%</p>
+                    <p class="latency-text">Hit Rate: <strong>99.2%</strong></p>
+                </div>
+
+                <div class="dash-card graph-card">
+                    <h3>Latencia en Tiempo Real (ms)</h3>
+                    <canvas id="latencyChart"></canvas>
                 </div>
             </div>
         </section>
@@ -82,6 +91,7 @@
     <script src="js/api.js"></script>
     <script src="js/clients.js"></script>
     <script src="js/products.js"></script>
-    <script src="js/dashboard.js"></script> <script src="js/navigation.js"></script>
+    <script src="js/dashboard.js"></script>
+    <script src="js/navigation.js"></script>
 </body>
 </html>
