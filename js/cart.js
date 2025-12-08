@@ -87,8 +87,16 @@ function clearCart() {
     updateCartState();
 }
 
-// 6. CHECKOUT (La Transacción ACID del video)
+// 6. CHECKOUT
 async function checkout() {
+    // 1. Verificar si hay usuario logueado
+    if (!currentUser) {
+        alert("🔒 Debes iniciar sesión para comprar.");
+        showSection('login');
+        toggleCart(); // Cerrar carrito
+        return;
+    }
+
     if (cart.length === 0) return alert("El carrito está vacío");
     
     // Botón en estado de carga
@@ -105,7 +113,7 @@ async function checkout() {
             total: totalOrder,
             delivery_method: "DELIVERY", 
             status: "PENDING",
-            client_id: 1,  // HARDCODED_CLIENT_ID
+            cclient_id: currentUser.id_key,
             bill_id: 1     // HARDCODED_BILL_ID
         };
 

@@ -2,34 +2,32 @@
 const clientsContainer = document.getElementById('clientsList');
 const btnLoad = document.getElementById('btnLoadClients');
 
+// Formulario de creación de cliente
+const formCreateClient = document.getElementById('formCreateClient');
+const msgContainer = document.getElementById('formMessage');
+
 // Función para obtener clientes de la API
 async function fetchClients() {
-    try {
-        // Mostramos mensaje de carga
-        clientsContainer.innerHTML = '<p>Cargando datos...</p>';
+    if (!clientsContainer) return; // Protección
 
-        // Hacemos la petición al Backend
+    try {
+        clientsContainer.innerHTML = '<p>Cargando datos...</p>';
         const response = await fetch(`${API_URL}/clients`);
         
-        // Si la respuesta no es OK, lanzamos error
         if (!response.ok) throw new Error('Error al conectar con la API');
 
-        // Convertimos la respuesta a JSON
         const clients = await response.json();
-        console.log("Clientes recibidos:", clients);
-
-        // Dibujamos los clientes
         renderClients(clients);
 
     } catch (error) {
-        console.error("Error:", error);
-        clientsContainer.innerHTML = `<p style="color: red">Error al cargar clientes: ${error.message}</p>`;
+        console.error("❌ Error:", error);
+        clientsContainer.innerHTML = `<p style="color: red">Error: ${error.message}</p>`;
     }
 }
 
-// Función para dibujar las tarjetas en el HTML
 function renderClients(clients) {
-    clientsContainer.innerHTML = ''; // Limpiar contenedor
+    if (!clientsContainer) return;
+    clientsContainer.innerHTML = ''; 
 
     if (clients.length === 0) {
         clientsContainer.innerHTML = '<p>No hay clientes registrados.</p>';
@@ -37,22 +35,54 @@ function renderClients(clients) {
     }
 
     clients.forEach(client => {
-        // Creamos el HTML de cada tarjeta
         const card = document.createElement('div');
         card.classList.add('card');
-        
         card.innerHTML = `
             <h3>${client.name} ${client.lastname}</h3>
-            <p><span class="card-email">${client.email}</span></p>
-            <p>${client.telephone || 'Sin teléfono'}</p>
+            <p>📧 <span class="card-email">${client.email}</span></p>
+            <p>📞 ${client.telephone || 'Sin teléfono'}</p>
         `;
-        
         clientsContainer.appendChild(card);
     });
 }
 
-// Eventos
-btnLoad.addEventListener('click', fetchClients);
+// --- EVENTOS ---
 
-// Cargar automáticamente al abrir la página
-document.addEventListener('DOMContentLoaded', fetchClients);
+if (btnLoad) {
+    btnLoad.addEventListener('click', fetchClients);
+}
+
+if (formCreateClient) {
+    formCreateClient.addEventListener('submit', async (e) => {
+        e.preventDefault();
+        const newClient = {
+            name: document.getElementById('clientName').value,
+            lastname: document.getElementById('clientLastname').value,
+            email: document.getElementById('clientEmail').value,
+            telephone: document.getElementById('clientPhone').value
+        };
+
+        try {
+            if(msgContainer) msgContainer.innerHTML = '<p style="color: blue">Enviando...</p>';
+            
+            const response = await fetch(`${API_URL}/clients/`, {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify(newClient)
+            });
+
+            if (!response.ok) throw new Error('Error al crear cliente');
+
+            if(msgContainer) msgContainer.innerHTML = '<p style="color: green">✅ ¡Cliente creado!</p>';
+            formCreateClient.reset();
+            fetchClients();
+            setTimeout(() => { if(msgContainer) msgContainer.innerHTML = ''; }, 3000);
+
+        } catch (error) {
+            console.error(error);
+            if(msgContainer) msgContainer.innerHTML = `<p style="color: red">Error: ${error.message}</p>`;
+        }
+    });
+}
+
+// document.addEventListener('DOMContentLoaded', fetchClients);
