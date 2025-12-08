@@ -1,0 +1,35 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>E-Commerce Final 2025</title>
+    <link rel="stylesheet" href="css/styles.css">
+</head>
+<body>
+
+    <nav class="navbar">
+        <div class="logo">🛒 Tienda Final 2025</div>
+        <ul class="nav-links">
+            <li><a href="#" class="active">Clientes</a></li>
+            <li><a href="#">Productos</a></li>
+            <li><a href="#">Órdenes</a></li>
+        </ul>
+    </nav>
+
+    <main class="container">
+        <header class="header-section">
+            <h1>Gestión de Clientes</h1>
+            <p>Lista de usuarios registrados en el sistema.</p>
+            <button id="btnLoadClients" class="btn-primary">🔄 Recargar Lista</button>
+        </header>
+
+        <div id="clientsList" class="cards-grid">
+            <p>Cargando clientes...</p>
+        </div>
+    </main>
+
+    <script src="js/api.js"></script>
+    <script src="js/clients.js"></script>
+</body>
+</html>
