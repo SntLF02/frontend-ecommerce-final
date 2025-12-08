@@ -199,3 +199,39 @@ canvas { width: 100% !important; height: 300px !important; }
 }
 .order-header { display: flex; justify-content: space-between; margin-bottom: 10px; border-bottom: 1px solid #eee; padding-bottom: 5px; }
 .auth-menu { display: flex; gap: 15px; align-items: center; }
+
+/* Controles de Cantidad en Carrito */
+.item-controls {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    background: #f4f4f9;
+    padding: 5px 10px;
+    border-radius: 20px;
+}
+
+.btn-qty {
+    background: #d4a373;
+    color: white;
+    border: none;
+    width: 25px;
+    height: 25px;
+    border-radius: 50%;
+    cursor: pointer;
+    font-weight: bold;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    transition: background 0.2s;
+}
+
+.btn-qty:hover { background: #a98467; }
+
+.qty-display { font-weight: bold; min-width: 20px; text-align: center; }
+
+/* Ajuste para inputs de número en Chrome (quita las flechitas feas) */
+input[type=number]::-webkit-inner-spin-button, 
+input[type=number]::-webkit-outer-spin-button { 
+  -webkit-appearance: none; 
+  margin: 0; 
+}

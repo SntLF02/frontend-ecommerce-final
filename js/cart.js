@@ -1,55 +1,72 @@
-// Estado del carrito (se inicia leyendo del LocalStorage si existe)
+// Estado del carrito
 let cart = JSON.parse(localStorage.getItem('baristaCart')) || [];
 
-// Elementos del DOM (Los crearemos en el HTML en el paso 2)
+// Elementos del DOM
 const cartCountBubble = document.getElementById('cart-count');
 const cartTotalElement = document.getElementById('cart-total');
 const cartItemsContainer = document.getElementById('cart-items');
 const cartModal = document.getElementById('cart-modal');
 
-// 1. Función para agregar al carrito
-function addToCart(product) {
-    // Buscamos si ya existe para sumar cantidad
+// 1. Agregar al carrito
+function addToCart(product, qty = 1) {
     const existingItem = cart.find(item => item.id_key === product.id_key);
 
     if (existingItem) {
-        if (existingItem.quantity < product.stock) {
-            existingItem.quantity++;
+        if (existingItem.quantity + qty <= product.stock) {
+            existingItem.quantity += qty;
         } else {
-            alert("¡No hay más stock disponible de este producto!");
+            alert("¡No hay suficiente stock disponible!");
             return;
         }
     } else {
-        // Si no existe, lo agregamos nuevo
-        cart.push({ ...product, quantity: 1 });
+        if (qty > product.stock) {
+            alert("¡No hay suficiente stock!");
+            return;
+        }
+        cart.push({ ...product, quantity: qty });
     }
 
     updateCartState();
-    alert(`✅ ${product.name} agregado al carrito`);
+    console.log(`✅ Agregado: ${qty} x ${product.name}`);
+    // Opcional: Abrir carrito automáticamente al agregar
+    // if (cartModal.style.display === 'none') toggleCart();
 }
 
-// 2. Actualizar estado (Guardar y Renderizar)
+// 2. Actualizar estado y LocalStorage
 function updateCartState() {
-    // Guardar en el navegador (Persistencia)
     localStorage.setItem('baristaCart', JSON.stringify(cart));
-    
-    // Actualizar burbuja del menú
     const totalItems = cart.reduce((sum, item) => sum + item.quantity, 0);
     if (cartCountBubble) cartCountBubble.innerText = totalItems;
-
-    // Si el modal está abierto, redibujarlo
-    if (cartModal && cartModal.style.display === 'flex') {
-        renderCartUI();
-    }
+    if (cartModal && cartModal.style.display === 'flex') renderCartUI();
 }
 
-// 3. Dibujar el Carrito (HTML)
+// 3. Modificar Cantidad (+/-) desde el Carrito
+function updateQuantity(index, change) {
+    const item = cart[index];
+    const newQty = item.quantity + change;
+
+    if (newQty > 0 && newQty <= item.stock) {
+        item.quantity = newQty;
+    } else if (newQty <= 0) {
+        // Si baja a 0, preguntamos si borrar
+        if (confirm("¿Quitar este producto del pedido?")) {
+            cart.splice(index, 1);
+        }
+    } else {
+        alert("Stock máximo alcanzado");
+    }
+    updateCartState();
+}
+
+// 4. Dibujar el Carrito
 function renderCartUI() {
+    if (!cartItemsContainer) return;
+    
     cartItemsContainer.innerHTML = '';
     let total = 0;
 
     if (cart.length === 0) {
-        cartItemsContainer.innerHTML = '<p style="text-align:center; color:#999;">Tu carrito está vacío ☕</p>';
+        cartItemsContainer.innerHTML = '<p style="text-align:center; color:#999; margin-top:20px;">Tu carrito está vacío ☕</p>';
     } else {
         cart.forEach((item, index) => {
             const subtotal = item.price * item.quantity;
@@ -57,64 +74,121 @@ function renderCartUI() {
 
             const itemDiv = document.createElement('div');
             itemDiv.classList.add('cart-item');
+            
+            // Aquí está el contador que pediste dentro del carrito
             itemDiv.innerHTML = `
                 <div class="item-info">
                     <h4>${item.name}</h4>
-                    <p>$${item.price.toLocaleString()} x ${item.quantity}</p>
+                    <p class="item-price">$${item.price.toLocaleString()}</p>
+                </div>
+                <div class="item-controls" style="display: flex; align-items: center; gap: 10px;">
+                    <button onclick="updateQuantity(${index}, -1)" class="btn-qty" style="width:25px; height:25px; border-radius:50%; border:none; background:#ddd; cursor:pointer;">-</button>
+                    <span class="qty-display" style="font-weight:bold;">${item.quantity}</span>
+                    <button onclick="updateQuantity(${index}, 1)" class="btn-qty" style="width:25px; height:25px; border-radius:50%; border:none; background:#d4a373; color:white; cursor:pointer;">+</button>
                 </div>
                 <div class="item-actions">
-                    <p class="item-subtotal">$${subtotal.toLocaleString()}</p>
-                    <button onclick="removeFromCart(${index})" class="btn-delete">🗑️</button>
+                    <p class="item-subtotal" style="font-weight:bold;">$${subtotal.toLocaleString()}</p>
+                    <button onclick="removeFromCart(${index})" class="btn-delete" title="Eliminar línea" style="background:none; border:none; cursor:pointer;">🗑️</button>
                 </div>
             `;
             cartItemsContainer.appendChild(itemDiv);
         });
     }
-
-    cartTotalElement.innerText = `$${total.toLocaleString()}`;
+    if(cartTotalElement) cartTotalElement.innerText = `$${total.toLocaleString()}`;
 }
 
-// 4. Eliminar Item
 function removeFromCart(index) {
-    cart.splice(index, 1);
-    updateCartState();
+    // El icono de basura borra la línea completa (todos los productos de ese tipo)
+    if(confirm("¿Eliminar todos los items de este producto?")) {
+        cart.splice(index, 1);
+        updateCartState();
+    }
 }
 
-// 5. Vaciar Carrito
 function clearCart() {
-    if(!confirm("¿Vaciar carrito?")) return;
-    cart = [];
-    updateCartState();
+    if (cart.length > 0 && confirm("¿Vaciar carrito por completo?")) {
+        cart = [];
+        updateCartState();
+    }
 }
 
-// 6. CHECKOUT
+// 5. CHECKOUT
 async function checkout() {
-    // 1. Verificar si hay usuario logueado
+    const currentUser = JSON.parse(localStorage.getItem('baristaUser'));
     if (!currentUser) {
-        alert("🔒 Debes iniciar sesión para comprar.");
+        alert("🔒 Inicia sesión para finalizar la compra.");
         showSection('login');
-        toggleCart(); // Cerrar carrito
+        toggleCart();
         return;
     }
 
     if (cart.length === 0) return alert("El carrito está vacío");
+
+    // 1. CAPTURAR DATOS DEL FORMULARIO
+    const paymentSelect = document.getElementById('payment-method');
+    const deliverySelect = document.getElementById('delivery-method');
+    const addressInput = document.getElementById('delivery-address');
+
+    const paymentType = parseInt(paymentSelect.value);
+    const deliveryMethod = parseInt(deliverySelect.value);
+    const address = addressInput.value.trim();
+
+    // Validación simple de dirección
+    if ((deliveryMethod === 3 || deliveryMethod === 2) && address === "") {
+        alert("⚠️ Por favor ingresa una dirección de envío.");
+        return;
+    }
+
+    // CONFIRMACIÓN VISUAL
+    const totalEstimado = cart.reduce((sum, item) => sum + (item.price * item.quantity), 0);
+    const confirmMsg = `
+    📝 Resumen del Pedido:
+    ----------------------
+    Total: $${totalEstimado.toLocaleString()}
+    Pago: ${paymentSelect.options[paymentSelect.selectedIndex].text}
+    Envío: ${deliverySelect.options[deliverySelect.selectedIndex].text}
+    ${deliveryMethod !== 1 ? `Dirección: ${address}` : ''}
     
-    // Botón en estado de carga
+    ¿Confirmar compra?
+    `;
+
+    if (!confirm(confirmMsg)) return;
+
+    // 2. PROCESAR COMPRA
     const btnCheckout = document.getElementById('btn-checkout');
     btnCheckout.innerText = "Procesando...";
     btnCheckout.disabled = true;
 
     try {
-        // A. Crear la Orden (Cabecera)
-        const totalOrder = cart.reduce((sum, item) => sum + (item.price * item.quantity), 0);
-        
+        // A. Factura
+        const billData = {
+            bill_number: `F-${Date.now()}`,
+            date: new Date().toISOString().split('T')[0],
+            total: totalEstimado,
+            payment_type: paymentType, // Valor dinámico
+            client_id: currentUser.id_key
+        };
+
+        const billRes = await fetch(`${API_URL}/bills/`, {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify(billData)
+        });
+
+        if (!billRes.ok) {
+            const err = await billRes.json();
+            throw new Error(`Error Factura: ${JSON.stringify(err.detail)}`);
+        }
+        const newBill = await billRes.json();
+
+        // B. Orden
         const orderData = {
             date: new Date().toISOString(),
-            total: totalOrder,
-            delivery_method: "DELIVERY", 
-            status: "PENDING",
-            cclient_id: currentUser.id_key,
-            bill_id: 1     // HARDCODED_BILL_ID
+            total: totalEstimado,
+            delivery_method: deliveryMethod, // Valor dinámico
+            status: 1, // PENDING
+            client_id: currentUser.id_key,
+            bill_id: newBill.id_key
         };
 
         const orderRes = await fetch(`${API_URL}/orders/`, {
@@ -123,11 +197,13 @@ async function checkout() {
             body: JSON.stringify(orderData)
         });
 
-        if (!orderRes.ok) throw new Error("Error creando la orden");
+        if (!orderRes.ok) {
+            const err = await orderRes.json();
+            throw new Error(`Error Orden: ${JSON.stringify(err.detail)}`);
+        }
         const newOrder = await orderRes.json();
-        console.log("✅ Orden Creada ID:", newOrder.id_key);
 
-        // B. Crear los Detalles
+        // C. Detalles
         const detailPromises = cart.map(item => {
             return fetch(`${API_URL}/order_details/`, {
                 method: 'POST',
@@ -143,23 +219,23 @@ async function checkout() {
 
         await Promise.all(detailPromises);
 
-        // C. Éxito
-        alert(`¡Compra Exitosa! 🎉\nOrden #${newOrder.id_key} generada correctamente.`);
-        cart = []; // Vaciar carrito
+        alert(`¡Gracias por tu compra! ☕\nTu pedido está siendo preparado.`);
+        cart = [];
         updateCartState();
-        toggleCart(); // Cerrar modal
+        toggleCart();
+        showSection('profile');
 
     } catch (error) {
         console.error(error);
-        alert("Error en la transacción: " + error.message);
+        alert("Error: " + error.message);
     } finally {
-        btnCheckout.innerText = "Confirmar Compra ($)";
+        btnCheckout.innerText = "Confirmar Compra";
         btnCheckout.disabled = false;
     }
 }
 
-// Funciones para abrir/cerrar el modal
 function toggleCart() {
+    if (!cartModal) return;
     if (cartModal.style.display === 'flex') {
         cartModal.style.display = 'none';
     } else {
@@ -168,5 +244,16 @@ function toggleCart() {
     }
 }
 
-// Inicializar burbuja al cargar
+// Mostrar/Ocultar dirección según envío
+function toggleAddressInput() {
+    const method = document.getElementById('delivery-method').value;
+    const addressContainer = document.getElementById('address-input-container');
+    
+    if (method === "1") {
+        addressContainer.style.display = 'none';
+    } else {
+        addressContainer.style.display = 'block';
+    }
+}
+
 document.addEventListener('DOMContentLoaded', updateCartState);

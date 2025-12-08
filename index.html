@@ -151,6 +151,32 @@
             <div id="cart-items" class="cart-items-scroll">
                 </div>
             <div class="cart-footer">
+                <div style="margin-bottom: 15px; border-bottom: 1px solid #eee; padding-bottom: 10px;">
+                    <label style="font-weight: bold; color: #2c1e16; display: block; margin-bottom: 5px;">Método de Envío:</label>
+                    <select id="delivery-method" onchange="toggleAddressInput()" style="width: 100%; padding: 8px; border: 1px solid #d4a373; border-radius: 4px; background: white; margin-bottom: 10px;">
+                        <option value="3">🚚 Envío a Domicilio</option> 
+                        <option value="1">🏪 Retiro en Tienda</option>
+                    </select>
+
+                    <div id="address-input-container">
+                        <input type="text" id="delivery-address" placeholder="Dirección de envío (Calle y Altura)" 
+                            style="width: 100%; padding: 8px; border: 1px solid #ccc; border-radius: 4px;">
+                    </div>
+                </div>
+
+                <div style="margin-bottom: 15px;">
+                    <label style="font-weight: bold; color: #2c1e16; display: block; margin-bottom: 5px;">Método de Pago:</label>
+                    <select id="payment-method" style="width: 100%; padding: 8px; border: 1px solid #d4a373; border-radius: 4px; background: white;">
+                        <option value="2">💳 Tarjeta (Crédito/Débito)</option>
+                        <option value="1">💵 Efectivo</option>
+                        <option value="5">💸 Transferencia Bancaria</option>
+                    </select>
+                    
+                    <div id="card-details" style="display:none; margin-top:5px; font-size:0.8rem; color:#777;">
+                        * Se solicitarán los datos en el siguiente paso seguro.
+                    </div>
+                </div>
+
                 <div class="cart-total-row">
                     <span>Total:</span>
                     <span id="cart-total" class="total-amount">$0</span>

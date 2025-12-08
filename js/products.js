@@ -73,7 +73,7 @@ function renderProducts(productsToRender) {
     productsContainer.innerHTML = '';
 
     if (productsToRender.length === 0) {
-        productsContainer.innerHTML = '<p style="text-align:center; grid-column: 1/-1;">No hay productos en esta categoría.</p>';
+        productsContainer.innerHTML = '<p style="text-align:center; grid-column: 1/-1;">No se encontraron productos.</p>';
         return;
     }
 
@@ -81,13 +81,14 @@ function renderProducts(productsToRender) {
         const card = document.createElement('div');
         card.classList.add('card');
         
-        // Lógica FOMO (Stock bajo)
+        // Stock Display
         let stockDisplay = `Stock: ${product.stock}`;
-        let stockClass = "";
         if (product.stock < 5) {
             stockDisplay += ` <span class="stock-warning">¡ÚLTIMAS ${product.stock}!</span>`;
-            stockClass = "border-color: #e74c3c;";
         }
+
+        // Input ID único para este producto
+        const inputId = `qty-${product.id_key}`;
 
         card.innerHTML = `
             <div>
@@ -96,14 +97,30 @@ function renderProducts(productsToRender) {
             </div>
             <div>
                 <p class="price-tag">$${product.price.toLocaleString()}</p>
-                <button class="btn-primary" 
-                    onclick='addToCart(${JSON.stringify(product)})'>
-                    Agregar al Carrito 🛒
-                </button>
+                
+                <div class="product-actions" style="display: flex; gap: 10px; align-items: center; margin-top: 10px;">
+                    <input type="number" id="${inputId}" value="1" min="1" max="${product.stock}" 
+                           style="width: 60px; padding: 8px; border: 1px solid #ccc; border-radius: 4px; text-align: center;">
+                    
+                    <button class="btn-primary" onclick="addProductFromCard(${product.id_key})" style="margin-top:0; flex:1;">
+                        Agregar 🛒
+                    </button>
+                </div>
             </div>
         `;
         productsContainer.appendChild(card);
     });
+}
+
+function addProductFromCard(productId) {
+    const product = allProducts.find(p => p.id_key === productId);
+    const input = document.getElementById(`qty-${productId}`);
+    const qty = parseInt(input.value);
+
+    if (product && qty > 0) {
+        addToCart(product, qty);
+        input.value = 1; // Resetear input
+    }
 }
 
 // 5. Lógica de Compra (Transacción)
