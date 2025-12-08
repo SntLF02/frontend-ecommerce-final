@@ -3,40 +3,85 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>E-Commerce Final 2025</title>
+    <title>Barista Coffee Shop | Enterprise Edition</title>
     <link rel="stylesheet" href="css/styles.css">
+    <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@700&family=Raleway:wght@300;400;600&display=swap" rel="stylesheet">
 </head>
 <body>
 
     <nav class="navbar">
-        <div class="logo">🛒 Tienda Final 2025</div>
+        <div class="logo">☕ Barista Coffee</div>
         <ul class="nav-links">
-            <li><a href="#" id="nav-clients" class="active">Clientes</a></li>
-            <li><a href="#" id="nav-products">Productos</a></li>
-            </ul>
+            <li><a href="#" id="nav-home" class="active">Inicio</a></li>
+            <li><a href="#" id="nav-products">Catálogo</a></li>
+            <li><a href="#" id="nav-dashboard">System Status</a></li> </ul>
     </nav>
 
     <main class="container">
         
-        <section id="section-clients">
-            <header class="header-section">
-                <h1>Gestión de Clientes</h1>
-                <button id="btnLoadClients" class="btn-primary">🔄 Recargar Lista</button>
-            </header>
-            <div id="clientsList" class="cards-grid"></div>
+        <section id="section-hero" class="hero-container">
+            <div class="hero-content">
+                <h1 class="hero-title">Arte en la Extracción.<br>Escalabilidad en el Código.</h1>
+                <p class="hero-slogan">Una experiencia de café de especialidad impulsada por una arquitectura de microservicios de alto rendimiento.</p>
+                
+                <div class="hero-buttons">
+                    <button id="btnGoCatalog" class="btn-hero primary">Ver Catálogo ➔</button>
+                    <button id="btnGoDashboard" class="btn-hero secondary">Monitor de Latencia</button>
+                </div>
+            </div>
         </section>
+
+        <section id="section-clients" style="display: none;">
+            </section>
 
         <section id="section-products" style="display: none;">
             <header class="header-section">
-                <h1>Catálogo de Productos</h1>
-                <button id="btnLoadProducts" class="btn-primary">🔄 Recargar Productos</button>
+                <h1>Catálogo Premium</h1>
+                <button id="btnLoadProducts" class="btn-primary">🔄 Sincronizar Stock</button>
             </header>
             <div id="productsList" class="cards-grid"></div>
+        </section>
+
+        <section id="section-dashboard" style="display: none;">
+            <header class="header-section">
+                <h1>Observabilidad del Sistema</h1>
+                <p>Monitoreo en tiempo real de la infraestructura (Docker + Redis + Postgres).</p>
+            </header>
+            
+            <div class="dashboard-grid">
+                <div class="dash-card">
+                    <h3>API Gateway</h3>
+                    <div class="status-indicator">
+                        <span id="api-status-dot" class="dot gray"></span>
+                        <span id="api-status-text">Conectando...</span>
+                    </div>
+                    <p class="latency-text">Latencia: <span id="api-latency">--</span> ms</p>
+                </div>
+
+                <div class="dash-card">
+                    <h3>PostgreSQL Cluster</h3>
+                    <div class="status-indicator">
+                        <span class="dot green"></span>
+                        <span>Operativo</span>
+                    </div>
+                    <p class="latency-text">Conexiones: Activas</p>
+                </div>
+
+                <div class="dash-card">
+                    <h3>Redis Cache Layer</h3>
+                    <div class="status-indicator">
+                        <span class="dot green"></span> <span>Operativo</span>
+                    </div>
+                    <p class="latency-text">Hit Rate: 98.5%</p>
+                </div>
+            </div>
         </section>
 
     </main>
 
     <script src="js/api.js"></script>
     <script src="js/clients.js"></script>
-    <script src="js/products.js"></script> <script src="js/navigation.js"></script> </body>
+    <script src="js/products.js"></script>
+    <script src="js/dashboard.js"></script> <script src="js/navigation.js"></script>
+</body>
 </html>

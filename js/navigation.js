@@ -1,38 +1,45 @@
-// Referencias a botones del menú
-const navClients = document.getElementById('nav-clients');
+const navHome = document.getElementById('nav-home');
 const navProducts = document.getElementById('nav-products');
+const navDashboard = document.getElementById('nav-dashboard');
 
-// Referencias a secciones
-const sectionClients = document.getElementById('section-clients');
+// Botones del Hero
+const btnGoCatalog = document.getElementById('btnGoCatalog');
+const btnGoDashboard = document.getElementById('btnGoDashboard');
+
+const sectionHero = document.getElementById('section-hero');
 const sectionProducts = document.getElementById('section-products');
+const sectionDashboard = document.getElementById('section-dashboard');
 
 function showSection(sectionName) {
-    // 1. Ocultar todo
-    sectionClients.style.display = 'none';
+    // Ocultar todo
+    sectionHero.style.display = 'none';
     sectionProducts.style.display = 'none';
+    sectionDashboard.style.display = 'none';
     
-    // 2. Quitar clase 'active' de todos los botones
-    navClients.classList.remove('active');
+    // Resetear navs
+    navHome.classList.remove('active');
     navProducts.classList.remove('active');
+    navDashboard.classList.remove('active');
 
-    // 3. Mostrar la sección elegida
-    if (sectionName === 'clients') {
-        sectionClients.style.display = 'block';
-        navClients.classList.add('active');
+    // Mostrar selección
+    if (sectionName === 'home') {
+        sectionHero.style.display = 'block';
+        navHome.classList.add('active');
     } else if (sectionName === 'products') {
         sectionProducts.style.display = 'block';
         navProducts.classList.add('active');
-        fetchProducts(); // Cargar productos automáticamente al entrar
+        fetchProducts();
+    } else if (sectionName === 'dashboard') {
+        sectionDashboard.style.display = 'block';
+        navDashboard.classList.add('active');
     }
 }
 
-// Eventos de clic
-navClients.addEventListener('click', (e) => {
-    e.preventDefault(); // Evita que el enlace recargue
-    showSection('clients');
-});
+// Event Listeners Navbar
+navHome.addEventListener('click', (e) => { e.preventDefault(); showSection('home'); });
+navProducts.addEventListener('click', (e) => { e.preventDefault(); showSection('products'); });
+navDashboard.addEventListener('click', (e) => { e.preventDefault(); showSection('dashboard'); });
 
-navProducts.addEventListener('click', (e) => {
-    e.preventDefault();
-    showSection('products');
-});
+// Event Listeners Botones Hero
+btnGoCatalog.addEventListener('click', () => showSection('products'));
+btnGoDashboard.addEventListener('click', () => showSection('dashboard'));

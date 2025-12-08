@@ -25,21 +25,28 @@ function renderProducts(products) {
     productsContainer.innerHTML = '';
 
     if (products.length === 0) {
-        productsContainer.innerHTML = '<p>No hay productos disponibles. ¡Crea algunos desde Swagger!</p>';
+        productsContainer.innerHTML = '<p>Cargando catálogo...</p>';
         return;
     }
 
     products.forEach(product => {
         const card = document.createElement('div');
         card.classList.add('card');
-        // Agregamos un borde de color distinto para productos
-        card.style.borderLeft = "5px solid #27ae60"; 
         
+        // Lógica de Stock Bajo (FOMO)
+        let stockDisplay = `Stock: ${product.stock}`;
+        if (product.stock < 5) {
+            stockDisplay += ` <span class="stock-warning">¡ÚLTIMAS ${product.stock} UNIDADES!</span>`;
+        }
+
         card.innerHTML = `
             <h3>${product.name}</h3>
-            <p style="font-size: 1.2rem; font-weight: bold; color: #27ae60;">$${product.price}</p>
-            <p>Stock: ${product.stock}</p>
-            <p style="font-size: 0.8rem; color: #aaa;">ID: ${product.id_key}</p>
+            <p class="price-tag">$${product.price.toLocaleString()}</p>
+            <p class="stock-tag">${stockDisplay}</p>
+            
+            <button class="btn-primary" onclick="buyProduct(${product.id_key}, ${product.price}, '${product.name}')" style="width: 100%; margin-top: 15px;">
+                 Agregar al Pedido
+            </button>
         `;
         productsContainer.appendChild(card);
     });
