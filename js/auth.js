@@ -21,10 +21,12 @@ async function loginByEmail(email) {
             showSection('home');
         } else {
             // Si no existe, sugerimos registro
-            if(confirm("No encontramos ese email. ¿Quieres registrarte?")) {
+            if(confirm("No encontramos ese email. ¿Quieres registrarte ahora?")) {
                 showSection('register');
-                // Pre-llenar el email en el formulario de registro
-                document.getElementById('reg-email').value = email;
+                
+                // Pre-llenar el email
+                const regEmailInput = document.getElementById('reg-email');
+                if(regEmailInput) regEmailInput.value = email;
             }
         }
     } catch (error) {

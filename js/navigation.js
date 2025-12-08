@@ -2,15 +2,15 @@
 const navHome = document.getElementById('nav-home');
 const navProducts = document.getElementById('nav-products');
 const navDashboard = document.getElementById('nav-dashboard');
-const navLogin = document.getElementById('nav-login'); // Botón Ingresar
-const navLogout = document.getElementById('nav-logout'); // Botón Salir
-const navUserDisplay = document.getElementById('nav-user-display'); // Nombre usuario
+const navLogin = document.getElementById('nav-login');
+const navLogout = document.getElementById('nav-logout');
+const navUserDisplay = document.getElementById('nav-user-display');
 
 // --- 2. Referencias a Botones del Hero ---
 const btnGoCatalog = document.getElementById('btnGoCatalog');
 const btnGoDashboard = document.getElementById('btnGoDashboard');
 
-// --- 3. Referencias a las Secciones (Pantallas) ---
+// --- 3. Referencias a las Secciones ---
 const sectionHero = document.getElementById('section-hero');
 const sectionProducts = document.getElementById('section-products');
 const sectionDashboard = document.getElementById('section-dashboard');
@@ -19,25 +19,48 @@ const sectionRegister = document.getElementById('section-register');
 const sectionProfile = document.getElementById('section-profile');
 
 // --- 4. Lógica de Formularios (Login/Registro) ---
+
+// Login
 const formLogin = document.getElementById('form-login');
 if (formLogin) {
     formLogin.addEventListener('submit', (e) => {
         e.preventDefault();
-        const email = document.getElementById('login-email').value;
+        const email = document.getElementById('login-email').value.trim();
         loginByEmail(email);
     });
 }
 
+// Registro
 const formRegister = document.getElementById('form-register');
 if (formRegister) {
     formRegister.addEventListener('submit', (e) => {
         e.preventDefault();
+        
+        // Capturar y limpiar el teléfono
+        let phoneInput = document.getElementById('reg-phone').value.trim();
+        
+        // 1. Quitar espacios y guiones
+        phoneInput = phoneInput.replace(/[\s-]/g, '');
+        
+        // 2. Si empieza con '0', quitarlo
+        if (phoneInput.startsWith('0')) {
+            phoneInput = phoneInput.substring(1);
+        }
+
+        // Validación preventiva
+        if (phoneInput.length < 7) {
+            alert("El teléfono debe tener al menos 7 dígitos.");
+            return;
+        }
+
         const userData = {
-            name: document.getElementById('reg-name').value,
-            lastname: document.getElementById('reg-lastname').value,
-            email: document.getElementById('reg-email').value,
-            telephone: document.getElementById('reg-phone').value
+            name: document.getElementById('reg-name').value.trim(),
+            lastname: document.getElementById('reg-lastname').value.trim(),
+            email: document.getElementById('reg-email').value.trim(),
+            telephone: phoneInput 
         };
+
+        console.log("Enviando datos de registro:", userData);
         registerUser(userData);
     });
 }
@@ -62,7 +85,7 @@ function showSection(sectionName) {
     } else if (sectionName === 'products') {
         if(sectionProducts) sectionProducts.style.display = 'block';
         if(navProducts) navProducts.classList.add('active');
-        fetchProducts(); // Cargar productos
+        fetchProducts(); 
     } else if (sectionName === 'dashboard') {
         if(sectionDashboard) sectionDashboard.style.display = 'block';
         if(navDashboard) navDashboard.classList.add('active');
@@ -72,7 +95,7 @@ function showSection(sectionName) {
         if(sectionRegister) sectionRegister.style.display = 'block';
     } else if (sectionName === 'profile') {
         if(sectionProfile) sectionProfile.style.display = 'block';
-        loadUserProfile(); // Cargar perfil
+        loadUserProfile();
     }
 }
 

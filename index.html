@@ -104,6 +104,13 @@
                     <input type="email" id="login-email" placeholder="ejemplo@correo.com" required style="width: 100%; padding: 10px; margin-bottom: 15px; border: 1px solid #ccc; border-radius: 4px;">
                     <button type="submit" class="btn-primary">Entrar</button>
                 </form>
+                
+                <div style="margin-top: 20px; font-size: 0.9rem; border-top: 1px solid #eee; padding-top: 15px;">
+                    <p>¿Aún no eres miembro?</p>
+                    <button onclick="showSection('register')" style="background: none; border: none; color: #d4a373; cursor: pointer; text-decoration: underline; font-weight: bold;">
+                        Crear una cuenta nueva
+                    </button>
+                </div>
             </div>
         </section>
 
@@ -114,9 +121,18 @@
                     <input type="text" id="reg-name" placeholder="Nombre" required style="padding: 10px; border: 1px solid #ccc; border-radius: 4px;">
                     <input type="text" id="reg-lastname" placeholder="Apellido" required style="padding: 10px; border: 1px solid #ccc; border-radius: 4px;">
                     <input type="email" id="reg-email" placeholder="Email" required style="padding: 10px; border: 1px solid #ccc; border-radius: 4px;">
-                    <input type="tel" id="reg-phone" placeholder="Teléfono" required style="padding: 10px; border: 1px solid #ccc; border-radius: 4px;">
+                    
+                    <input type="tel" id="reg-phone" placeholder="Teléfono (Ej: 549261... sin 0 al inicio)" required style="padding: 10px; border: 1px solid #ccc; border-radius: 4px;">
+                    
                     <button type="submit" class="btn-primary">Registrarme</button>
                 </form>
+
+                <div style="margin-top: 20px; text-align: center; font-size: 0.9rem; border-top: 1px solid #eee; padding-top: 15px;">
+                    <p>¿Ya tienes cuenta?</p>
+                    <button onclick="showSection('login')" style="background: none; border: none; color: #d4a373; cursor: pointer; text-decoration: underline; font-weight: bold;">
+                        Iniciar Sesión
+                    </button>
+                </div>
             </div>
         </section>
 
@@ -155,6 +171,6 @@
     <script src="js/navigation.js"></script>
     <script src="js/auth.js"></script>
     <script src="js/profile.js"></script>
-    
+
 </body>
 </html>
