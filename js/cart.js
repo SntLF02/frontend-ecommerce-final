@@ -28,11 +28,9 @@ function addToCart(product, qty = 1) {
 
     updateCartState();
     console.log(`✅ Agregado: ${qty} x ${product.name}`);
-    // Opcional: Abrir carrito automáticamente al agregar
-    // if (cartModal.style.display === 'none') toggleCart();
 }
 
-// 2. Actualizar estado y LocalStorage
+// 2. Actualizar estado
 function updateCartState() {
     localStorage.setItem('baristaCart', JSON.stringify(cart));
     const totalItems = cart.reduce((sum, item) => sum + item.quantity, 0);
@@ -40,7 +38,7 @@ function updateCartState() {
     if (cartModal && cartModal.style.display === 'flex') renderCartUI();
 }
 
-// 3. Modificar Cantidad (+/-) desde el Carrito
+// 3. Modificar Cantidad
 function updateQuantity(index, change) {
     const item = cart[index];
     const newQty = item.quantity + change;
@@ -48,8 +46,7 @@ function updateQuantity(index, change) {
     if (newQty > 0 && newQty <= item.stock) {
         item.quantity = newQty;
     } else if (newQty <= 0) {
-        // Si baja a 0, preguntamos si borrar
-        if (confirm("¿Quitar este producto del pedido?")) {
+        if (confirm("¿Eliminar producto del carrito?")) {
             cart.splice(index, 1);
         }
     } else {
@@ -74,8 +71,6 @@ function renderCartUI() {
 
             const itemDiv = document.createElement('div');
             itemDiv.classList.add('cart-item');
-            
-            // Aquí está el contador que pediste dentro del carrito
             itemDiv.innerHTML = `
                 <div class="item-info">
                     <h4>${item.name}</h4>
@@ -95,24 +90,137 @@ function renderCartUI() {
         });
     }
     if(cartTotalElement) cartTotalElement.innerText = `$${total.toLocaleString()}`;
+    
+    // Inicializar estado visual de dirección
+    toggleAddressInput();
 }
 
 function removeFromCart(index) {
-    // El icono de basura borra la línea completa (todos los productos de ese tipo)
-    if(confirm("¿Eliminar todos los items de este producto?")) {
+    if(confirm("¿Eliminar items?")) {
         cart.splice(index, 1);
         updateCartState();
     }
 }
 
 function clearCart() {
-    if (cart.length > 0 && confirm("¿Vaciar carrito por completo?")) {
+    if (cart.length > 0 && confirm("¿Vaciar carrito?")) {
         cart = [];
         updateCartState();
     }
 }
 
-// 5. CHECKOUT
+// --- LÓGICA DE DIRECCIONES ---
+
+function toggleAddressInput() {
+    const method = document.getElementById('delivery-method').value;
+    const addressContainer = document.getElementById('address-input-container');
+    const storeAddress = document.getElementById('store-address-display');
+    
+    // Método 1 = Retiro en Tienda
+    if (method === "1") {
+        addressContainer.style.display = 'none';
+        storeAddress.style.display = 'block';
+    } else {
+        addressContainer.style.display = 'block';
+        storeAddress.style.display = 'none';
+    }
+}
+
+// Mostrar direcciones guardadas al hacer click en el input
+async function showSavedAddresses() {
+    const currentUser = JSON.parse(localStorage.getItem('baristaUser'));
+    if (!currentUser) return; // Si no está logueado, no mostramos nada
+
+    const listContainer = document.getElementById('saved-addresses-list');
+    listContainer.innerHTML = 'Loading...';
+    listContainer.style.display = 'block';
+
+    try {
+        // Obtenemos todas las direcciones 
+        const response = await fetch(`${API_URL}/addresses`);
+        const allAddresses = await response.json();
+        
+        // Filtramos las del usuario actual
+        const myAddresses = allAddresses.filter(a => a.client_id === currentUser.id_key);
+
+        listContainer.innerHTML = ''; // Limpiar
+
+        if (myAddresses.length === 0) {
+            listContainer.innerHTML = '<div class="address-option" style="cursor:default; color:#999;">No tienes direcciones guardadas</div>';
+        } else {
+            myAddresses.forEach(addr => {
+                const div = document.createElement('div');
+                div.className = 'address-option';
+                const fullText = `${addr.street} ${addr.number}`; 
+                div.textContent = `📍 ${fullText} - ${addr.city}`;
+                
+                div.onclick = () => {
+                    document.getElementById('delivery-address').value = fullText;
+                    listContainer.style.display = 'none';
+                };
+                listContainer.appendChild(div);
+            });
+        }
+
+        document.addEventListener('click', function closeList(e) {
+            if (!e.target.closest('#address-input-container')) {
+                listContainer.style.display = 'none';
+                document.removeEventListener('click', closeList);
+            }
+        });
+
+    } catch (error) {
+        console.error("Error fetching addresses:", error);
+        listContainer.style.display = 'none';
+    }
+}
+
+// Guardar la dirección actual en la API
+async function saveCurrentAddress() {
+    const currentUser = JSON.parse(localStorage.getItem('baristaUser'));
+    if (!currentUser) return alert("Inicia sesión para guardar direcciones.");
+
+    const inputVal = document.getElementById('delivery-address').value.trim();
+    if (!inputVal) return alert("Escribe una dirección primero.");
+
+    const match = inputVal.match(/(\d+)$/); 
+    
+    let street, number;
+    if (match) {
+        number = match[0];
+        street = inputVal.replace(number, '').trim();
+    } else {
+        street = inputVal;
+        number = "S/N";
+    }
+
+    const addressData = {
+        street: street,
+        number: number,
+        city: "Mendoza", // Default para el TP
+        client_id: currentUser.id_key
+    };
+
+    try {
+        const response = await fetch(`${API_URL}/addresses/`, {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify(addressData)
+        });
+
+        if (!response.ok) throw new Error("Error API");
+        
+        alert("✅ Dirección guardada en tu cuenta.");
+        // Ocultar lista por si quedó abierta
+        document.getElementById('saved-addresses-list').style.display = 'none';
+
+    } catch (error) {
+        console.error(error);
+        alert("No se pudo guardar la dirección.");
+    }
+}
+
+// 5. CHECKOUT FINAL
 async function checkout() {
     const currentUser = JSON.parse(localStorage.getItem('baristaUser'));
     if (!currentUser) {
@@ -124,7 +232,6 @@ async function checkout() {
 
     if (cart.length === 0) return alert("El carrito está vacío");
 
-    // 1. CAPTURAR DATOS DEL FORMULARIO
     const paymentSelect = document.getElementById('payment-method');
     const deliverySelect = document.getElementById('delivery-method');
     const addressInput = document.getElementById('delivery-address');
@@ -133,13 +240,13 @@ async function checkout() {
     const deliveryMethod = parseInt(deliverySelect.value);
     const address = addressInput.value.trim();
 
-    // Validación simple de dirección
+    // Validación
     if ((deliveryMethod === 3 || deliveryMethod === 2) && address === "") {
         alert("⚠️ Por favor ingresa una dirección de envío.");
         return;
     }
 
-    // CONFIRMACIÓN VISUAL
+    // Confirmación
     const totalEstimado = cart.reduce((sum, item) => sum + (item.price * item.quantity), 0);
     const confirmMsg = `
     📝 Resumen del Pedido:
@@ -147,60 +254,49 @@ async function checkout() {
     Total: $${totalEstimado.toLocaleString()}
     Pago: ${paymentSelect.options[paymentSelect.selectedIndex].text}
     Envío: ${deliverySelect.options[deliverySelect.selectedIndex].text}
-    ${deliveryMethod !== 1 ? `Dirección: ${address}` : ''}
+    ${deliveryMethod !== 1 ? `Dirección: ${address}` : 'Retiro en: Av. San Martín 1450'}
     
     ¿Confirmar compra?
     `;
 
     if (!confirm(confirmMsg)) return;
 
-    // 2. PROCESAR COMPRA
     const btnCheckout = document.getElementById('btn-checkout');
     btnCheckout.innerText = "Procesando...";
     btnCheckout.disabled = true;
 
     try {
         // A. Factura
-        const billData = {
-            bill_number: `F-${Date.now()}`,
-            date: new Date().toISOString().split('T')[0],
-            total: totalEstimado,
-            payment_type: paymentType, // Valor dinámico
-            client_id: currentUser.id_key
-        };
-
         const billRes = await fetch(`${API_URL}/bills/`, {
             method: 'POST',
             headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify(billData)
+            body: JSON.stringify({
+                bill_number: `F-${Date.now()}`,
+                date: new Date().toISOString().split('T')[0],
+                total: totalEstimado,
+                payment_type: paymentType,
+                client_id: currentUser.id_key
+            })
         });
 
-        if (!billRes.ok) {
-            const err = await billRes.json();
-            throw new Error(`Error Factura: ${JSON.stringify(err.detail)}`);
-        }
+        if (!billRes.ok) throw new Error("Error Factura");
         const newBill = await billRes.json();
 
         // B. Orden
-        const orderData = {
-            date: new Date().toISOString(),
-            total: totalEstimado,
-            delivery_method: deliveryMethod, // Valor dinámico
-            status: 1, // PENDING
-            client_id: currentUser.id_key,
-            bill_id: newBill.id_key
-        };
-
         const orderRes = await fetch(`${API_URL}/orders/`, {
             method: 'POST',
             headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify(orderData)
+            body: JSON.stringify({
+                date: new Date().toISOString(),
+                total: totalEstimado,
+                delivery_method: deliveryMethod,
+                status: 1, // PENDING
+                client_id: currentUser.id_key,
+                bill_id: newBill.id_key
+            })
         });
 
-        if (!orderRes.ok) {
-            const err = await orderRes.json();
-            throw new Error(`Error Orden: ${JSON.stringify(err.detail)}`);
-        }
+        if (!orderRes.ok) throw new Error("Error Orden");
         const newOrder = await orderRes.json();
 
         // C. Detalles
@@ -219,7 +315,7 @@ async function checkout() {
 
         await Promise.all(detailPromises);
 
-        alert(`¡Gracias por tu compra! ☕\nTu pedido está siendo preparado.`);
+        alert(`¡Gracias por tu compra! ☕\nPedido #${newOrder.id_key} confirmado.`);
         cart = [];
         updateCartState();
         toggleCart();
@@ -227,9 +323,9 @@ async function checkout() {
 
     } catch (error) {
         console.error(error);
-        alert("Error: " + error.message);
+        alert("Error procesando la compra.");
     } finally {
-        btnCheckout.innerText = "Confirmar Compra";
+        btnCheckout.innerText = "Confirmar Compra 💳";
         btnCheckout.disabled = false;
     }
 }
@@ -241,18 +337,6 @@ function toggleCart() {
     } else {
         cartModal.style.display = 'flex';
         renderCartUI();
-    }
-}
-
-// Mostrar/Ocultar dirección según envío
-function toggleAddressInput() {
-    const method = document.getElementById('delivery-method').value;
-    const addressContainer = document.getElementById('address-input-container');
-    
-    if (method === "1") {
-        addressContainer.style.display = 'none';
-    } else {
-        addressContainer.style.display = 'block';
     }
 }
 

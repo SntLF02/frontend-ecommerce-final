@@ -231,3 +231,34 @@ input[type=number]::-webkit-inner-spin-button, input[type=number]::-webkit-outer
 .order-card { background: white; padding: 15px; border-radius: 8px; border-left: 4px solid #a98467; box-shadow: 0 2px 5px rgba(0,0,0,0.05); }
 .order-header { display: flex; justify-content: space-between; margin-bottom: 10px; border-bottom: 1px solid #eee; padding-bottom: 5px; }
 .auth-menu { display: flex; gap: 15px; align-items: center; }
+
+.address-dropdown {
+    position: absolute;
+    top: 100%;
+    left: 0;
+    width: 100%;
+    background: white;
+    border: 1px solid #d4a373;
+    border-radius: 0 0 4px 4px;
+    box-shadow: 0 4px 6px rgba(0,0,0,0.1);
+    z-index: 100;
+    max-height: 150px;
+    overflow-y: auto;
+}
+
+.address-option {
+    padding: 8px 12px;
+    cursor: pointer;
+    border-bottom: 1px solid #eee;
+    font-size: 0.9rem;
+    color: #555;
+    transition: background 0.2s;
+}
+
+.address-option:hover {
+    background-color: #fdfbf7;
+    color: #2c1e16;
+    font-weight: bold;
+}
+
+.address-option:last-child { border-bottom: none; }

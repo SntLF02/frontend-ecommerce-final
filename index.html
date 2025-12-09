@@ -154,13 +154,30 @@
                 <div style="margin-bottom: 15px; border-bottom: 1px solid #eee; padding-bottom: 10px;">
                     <label style="font-weight: bold; color: #2c1e16; display: block; margin-bottom: 5px;">Método de Envío:</label>
                     <select id="delivery-method" onchange="toggleAddressInput()" style="width: 100%; padding: 8px; border: 1px solid #d4a373; border-radius: 4px; background: white; margin-bottom: 10px;">
-                        <option value="3">🚚 Envío a Domicilio</option> 
+                        <option value="3">🚚 Envío a Domicilio</option>
                         <option value="1">🏪 Retiro en Tienda</option>
                     </select>
 
-                    <div id="address-input-container">
-                        <input type="text" id="delivery-address" placeholder="Dirección de envío (Calle y Altura)" 
-                            style="width: 100%; padding: 8px; border: 1px solid #ccc; border-radius: 4px;">
+                    <div id="store-address-display" style="display: none; background: #fdfbf7; padding: 10px; border-left: 3px solid #27ae60; font-size: 0.9rem;">
+                        <p style="margin:0; font-weight:bold; color:#2c1e16;">📍 Punto de Retiro:</p>
+                        <p style="margin:5px 0 0 0; color:#555;">Av. San Martín 1450, Ciudad de Mendoza.</p>
+                    </div>
+
+                    <div id="address-input-container" style="position: relative;">
+                        <div style="display: flex; gap: 5px;">
+                            <input type="text" id="delivery-address" 
+                                placeholder="Calle y Número (Ej: Belgrano 450)" 
+                                onfocus="showSavedAddresses()"
+                                style="flex: 1; padding: 8px; border: 1px solid #ccc; border-radius: 4px;">
+                            
+                            <button onclick="saveCurrentAddress()" title="Guardar esta dirección" 
+                                    style="background: #d4a373; border: none; border-radius: 4px; color: white; cursor: pointer; padding: 0 12px; font-size: 1.2rem;">
+                                💾
+                            </button>
+                        </div>
+                        
+                        <div id="saved-addresses-list" class="address-dropdown" style="display: none;">
+                            </div>
                     </div>
                 </div>
 
