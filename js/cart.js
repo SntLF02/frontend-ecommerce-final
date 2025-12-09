@@ -126,24 +126,22 @@ function toggleAddressInput() {
     }
 }
 
-// Mostrar direcciones guardadas al hacer click en el input
+// Mostrar direcciones guardadas
 async function showSavedAddresses() {
     const currentUser = JSON.parse(localStorage.getItem('baristaUser'));
-    if (!currentUser) return; // Si no está logueado, no mostramos nada
+    if (!currentUser) return; 
 
     const listContainer = document.getElementById('saved-addresses-list');
-    listContainer.innerHTML = 'Loading...';
+    listContainer.innerHTML = 'Cargando...';
     listContainer.style.display = 'block';
 
     try {
-        // Obtenemos todas las direcciones 
         const response = await fetch(`${API_URL}/addresses`);
         const allAddresses = await response.json();
         
-        // Filtramos las del usuario actual
         const myAddresses = allAddresses.filter(a => a.client_id === currentUser.id_key);
 
-        listContainer.innerHTML = ''; // Limpiar
+        listContainer.innerHTML = '';
 
         if (myAddresses.length === 0) {
             listContainer.innerHTML = '<div class="address-option" style="cursor:default; color:#999;">No tienes direcciones guardadas</div>';
@@ -151,11 +149,13 @@ async function showSavedAddresses() {
             myAddresses.forEach(addr => {
                 const div = document.createElement('div');
                 div.className = 'address-option';
-                const fullText = `${addr.street} ${addr.number}`; 
-                div.textContent = `📍 ${fullText} - ${addr.city}`;
+                
+                const streetText = `${addr.street} ${addr.number}`; 
+                div.textContent = `📍 ${streetText}, ${addr.city}`;
                 
                 div.onclick = () => {
-                    document.getElementById('delivery-address').value = fullText;
+                    document.getElementById('delivery-address').value = streetText;
+                    document.getElementById('delivery-city').value = addr.city;
                     listContainer.style.display = 'none';
                 };
                 listContainer.appendChild(div);
@@ -175,29 +175,31 @@ async function showSavedAddresses() {
     }
 }
 
-// Guardar la dirección actual en la API
+// Guardar dirección en la API
 async function saveCurrentAddress() {
     const currentUser = JSON.parse(localStorage.getItem('baristaUser'));
     if (!currentUser) return alert("Inicia sesión para guardar direcciones.");
 
-    const inputVal = document.getElementById('delivery-address').value.trim();
-    if (!inputVal) return alert("Escribe una dirección primero.");
+    const streetInput = document.getElementById('delivery-address').value.trim();
+    const cityInput = document.getElementById('delivery-city').value.trim();
 
-    const match = inputVal.match(/(\d+)$/); 
-    
+    if (!streetInput || !cityInput) return alert("Completa Calle y Ciudad para guardar.");
+
+    // Parsear número
+    const match = streetInput.match(/(\d+)$/); 
     let street, number;
     if (match) {
         number = match[0];
-        street = inputVal.replace(number, '').trim();
+        street = streetInput.replace(number, '').trim();
     } else {
-        street = inputVal;
+        street = streetInput;
         number = "S/N";
     }
 
     const addressData = {
         street: street,
         number: number,
-        city: "Mendoza", // Default para el TP
+        city: cityInput,
         client_id: currentUser.id_key
     };
 
@@ -210,8 +212,7 @@ async function saveCurrentAddress() {
 
         if (!response.ok) throw new Error("Error API");
         
-        alert("✅ Dirección guardada en tu cuenta.");
-        // Ocultar lista por si quedó abierta
+        alert(`✅ Dirección en ${cityInput} guardada correctamente.`);
         document.getElementById('saved-addresses-list').style.display = 'none';
 
     } catch (error) {
@@ -232,35 +233,41 @@ async function checkout() {
 
     if (cart.length === 0) return alert("El carrito está vacío");
 
+    // 1. Calcular TOTAL
+    const totalEstimado = cart.reduce((sum, item) => sum + (item.price * item.quantity), 0);
+
+    // 2. Capturar Inputs
     const paymentSelect = document.getElementById('payment-method');
     const deliverySelect = document.getElementById('delivery-method');
     const addressInput = document.getElementById('delivery-address');
+    const cityInput = document.getElementById('delivery-city');
 
     const paymentType = parseInt(paymentSelect.value);
     const deliveryMethod = parseInt(deliverySelect.value);
     const address = addressInput.value.trim();
+    const city = cityInput.value.trim();
 
-    // Validación
-    if ((deliveryMethod === 3 || deliveryMethod === 2) && address === "") {
-        alert("⚠️ Por favor ingresa una dirección de envío.");
-        return;
+    // 3. Validación
+    if ((deliveryMethod === 3 || deliveryMethod === 2)) {
+        if(address === "") return alert("⚠️ Por favor ingresa la Calle y Altura.");
+        if(city === "") return alert("⚠️ Por favor ingresa la Ciudad.");
     }
 
-    // Confirmación
-    const totalEstimado = cart.reduce((sum, item) => sum + (item.price * item.quantity), 0);
+    // 4. Confirmación Visual
     const confirmMsg = `
     📝 Resumen del Pedido:
     ----------------------
     Total: $${totalEstimado.toLocaleString()}
     Pago: ${paymentSelect.options[paymentSelect.selectedIndex].text}
     Envío: ${deliverySelect.options[deliverySelect.selectedIndex].text}
-    ${deliveryMethod !== 1 ? `Dirección: ${address}` : 'Retiro en: Av. San Martín 1450'}
+    ${deliveryMethod !== 1 ? `Destino: ${address}, ${city}` : 'Retiro en: Av. San Martín 1450'}
     
     ¿Confirmar compra?
     `;
 
     if (!confirm(confirmMsg)) return;
 
+    // 5. Procesar Compra
     const btnCheckout = document.getElementById('btn-checkout');
     btnCheckout.innerText = "Procesando...";
     btnCheckout.disabled = true;
