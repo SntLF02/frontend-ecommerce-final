@@ -2,47 +2,36 @@
 
 Este repositorio contiene el Frontend desarrollado para el Trabajo Final Integrador. Es una aplicación web moderna tipo **Single Page Application (SPA)** construida con **Vanilla JavaScript** que consume una API RESTful desarrollada en Python (FastAPI).
 
-El proyecto simula una plataforma de E-commerce de "Nivel Empresarial" con gestión de estado del lado del cliente y monitoreo en tiempo real.
+## 🔗 Enlaces del Proyecto (Deploy)
+
+* 🌐 **Frontend (Tienda):** [https://barista-coffee-frontend.onrender.com](https://barista-coffee-frontend.onrender.com)
+* ⚙️ **Backend (Documentación Swagger):** [https://ecommerce-api-hug4.onrender.com/docs](https://ecommerce-api-hug4.onrender.com/docs)
+
+---
 
 ## 🚀 Características Principales
 
 ### 🛒 Experiencia de Compra (E-commerce)
 * **Catálogo Dinámico:** Consumo de productos y categorías desde la API.
-* **Gestión de Stock (FOMO):** Indicadores visuales de "Últimas unidades" y estado "Agotado" (deshabilitando compras) basado en datos reales.
-* **Carrito Persistente:** Implementación de **LocalStorage** para mantener la selección del usuario incluso si cierra el navegador (Stateful Client).
-* **Checkout Avanzado:** Flujo de compra que incluye:
-    * Selección de método de envío (Domicilio vs Retiro).
-    * **Gestión de Direcciones:** Guardado y reutilización de direcciones de envío (`POST /addresses`).
-    * Generación transaccional de **Facturas (Bills)** y **Órdenes**.
+* **Gestión de Stock (FOMO):** Indicadores visuales de "Últimas unidades" y estado "Agotado" con bloqueo de compra.
+* **Carrito Persistente:** Implementación de **LocalStorage** para mantener la selección del usuario (Stateful Client).
+* **Checkout Avanzado:** Flujo transaccional completo:
+    * Selección de envío (Domicilio vs Retiro).
+    * **Gestión de Direcciones:** Guardado y autocompletado inteligente de direcciones (`POST /addresses`).
+    * Generación atómica de **Facturas (Bills)** y **Órdenes**.
 
-### 👤 Gestión de Usuarios
-* **Autenticación:** Sistema de Login y Registro de clientes validado contra la base de datos.
-* **Perfil de Usuario:** Visualización del historial de pedidos con desglose de productos comprados y estado del envío.
+### 👤 Gestión de Usuarios y Social Proof
+* **Autenticación:** Login y Registro validado contra base de datos PostgreSQL.
+* **Perfil de Usuario:** Historial detallado de pedidos con desglose de productos y estados.
+* **Reseñas:** Sistema de calificación (estrellas) y comentarios en tiempo real.
 
 ### 📊 Dashboard de Observabilidad
 * **Monitoreo en Tiempo Real:** Panel que consume el endpoint de `health_check` cada 2 segundos.
-* **Gráficos de Latencia:** Visualización de la respuesta del servidor utilizando la librería `Chart.js`.
+* **Gráficos de Latencia:** Visualización de la respuesta del servidor con `Chart.js`.
 
 ## 🛠️ Tecnologías Utilizadas
 
-* **Lenguajes:** HTML5 Semántico, CSS3 (Diseño Responsivo con Flexbox/Grid), JavaScript (ES6+).
-* **Librerías:** `Chart.js` (para gráficos de métricas).
-* **API:** Fetch API con manejo de promesas y `async/await`.
-* **Diseño:** Estilo minimalista "Coffee Shop" con tipografías *Playfair Display* y *Raleway*.
-
-## ⚙️ Configuración e Instalación
-
-1.  **Clonar el repositorio:**
-    ```bash
-    git clone [https://github.com/tu-usuario/frontend-ecommerce-final.git](https://github.com/tu-usuario/frontend-ecommerce-final.git)
-    ```
-
-2.  **Configurar Endpoint (Opcional):**
-    El archivo `js/api.js` ya se encuentra configurado para apuntar al Backend desplegado en Render:
-    ```javascript
-    const API_URL = "[https://ecommerce-api-hug4.onrender.com](https://ecommerce-api-hug4.onrender.com)";
-    ```
-
-3.  **Ejecutar:**
-    No requiere instalación de dependencias (`npm`). Simplemente abre el archivo `index.html` en tu navegador o utiliza la extensión **Live Server** de VS Code.
-
+* **Lenguajes:** HTML5, CSS3 (Flexbox/Grid), JavaScript (ES6+).
+* **Librerías:** `Chart.js` (métricas).
+* **API:** Fetch API asíncrona.
+* **Diseño:** UI minimalista "Coffee Shop" responsiva.
