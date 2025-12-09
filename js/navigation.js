@@ -36,18 +36,13 @@ if (formRegister) {
     formRegister.addEventListener('submit', (e) => {
         e.preventDefault();
         
-        // Capturar y limpiar el teléfono
         let phoneInput = document.getElementById('reg-phone').value.trim();
         
-        // 1. Quitar espacios y guiones
         phoneInput = phoneInput.replace(/[\s-]/g, '');
-        
-        // 2. Si empieza con '0', quitarlo
         if (phoneInput.startsWith('0')) {
             phoneInput = phoneInput.substring(1);
         }
 
-        // Validación preventiva
         if (phoneInput.length < 7) {
             alert("El teléfono debe tener al menos 7 dígitos.");
             return;
@@ -60,7 +55,6 @@ if (formRegister) {
             telephone: phoneInput 
         };
 
-        console.log("Enviando datos de registro:", userData);
         registerUser(userData);
     });
 }
@@ -80,7 +74,7 @@ function showSection(sectionName) {
 
     // C. Mostrar la sección elegida
     if (sectionName === 'home') {
-        if(sectionHero) sectionHero.style.display = 'block';
+        if(sectionHero) sectionHero.style.display = 'flex';
         if(navHome) navHome.classList.add('active');
     } else if (sectionName === 'products') {
         if(sectionProducts) sectionProducts.style.display = 'block';
