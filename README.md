@@ -5,7 +5,7 @@ Este repositorio contiene el Frontend desarrollado para el Trabajo Final Integra
 ## 🔗 Enlaces del Proyecto (Deploy)
 
 * 🌐 **Frontend (Tienda):** [https://barista-coffee-frontend.onrender.com](https://barista-coffee-frontend.onrender.com)
-* ⚙️ **Backend (Documentación Swagger):** [https://ecommerce-api-hug4.onrender.com/docs](https://ecommerce-api-hug4.onrender.com/docs)
+* ⚙️ **Backend (Documentación Swagger):** [https://backend-ecommerce-api-16kf.onrender.com/docs](https://backend-ecommerce-api-16kf.onrender.com/docs)
 
 ---
 
